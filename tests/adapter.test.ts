@@ -146,7 +146,12 @@ describe('buildAuthRedirect: happy path', () => {
 
 	it('passes the configured redirectUri to registerClient', async () => {
 		const client = makeClient();
-		const adapter = createMastodonAdapter(config({ client }), jar());
+		// Fresh store: ensure registerClient is invoked rather than served
+		// from the module-scoped default cache.
+		const adapter = createMastodonAdapter(
+			config({ client, clientStore: makeStore() }),
+			jar(),
+		);
 		await adapter.buildAuthRedirect({ instanceInput: 'hachyderm.io' });
 		expect(client.registerClient).toHaveBeenCalledWith(
 			expect.any(URL),
@@ -202,7 +207,11 @@ describe('buildAuthRedirect: error paths', () => {
 				throw new Error('oops');
 			}),
 		});
-		const adapter = createMastodonAdapter(config({ client }), jar());
+		// Fresh store so registerClient is actually called.
+		const adapter = createMastodonAdapter(
+			config({ client, clientStore: makeStore() }),
+			jar(),
+		);
 		await expect(
 			adapter.buildAuthRedirect({ instanceInput: 'hachyderm.io' }),
 		).rejects.toThrow(/oops/);
@@ -799,6 +808,36 @@ describe('issueRenewal', () => {
 		};
 		expect(await adapter.issueRenewal(fakeUpactor, undefined)).toBeNull();
 		expect(await adapter.issueRenewal(fakeUpactor, { anything: 1 })).toBeNull();
+	});
+});
+
+describe('createMastodonAdapter: default ClientStore is module-scoped', () => {
+	// Regression test for the bug where two adapter instances using the
+	// default (no-config) ClientStore would not share OAuth client
+	// credentials. The SvelteKit hook pattern constructs a fresh adapter
+	// per request, so init (request A) and callback (request B) need to
+	// see the same store.
+	it('shares registered credentials across two adapters with no clientStore configured', async () => {
+		const registerMock = vi.fn(async () => ({
+			client_id: `cid-shared-${Math.random()}`,
+			client_secret: 'shared-secret',
+		}));
+		const client1 = makeClient({ registerClient: registerMock });
+		const adapter1 = createMastodonAdapter(
+			config({ client: client1 }),
+			jar(),
+		);
+		await adapter1.buildAuthRedirect({ instanceInput: 'shared-test.example' });
+		expect(registerMock).toHaveBeenCalledTimes(1);
+
+		// Second adapter, no clientStore configured: should hit the cache.
+		const client2 = makeClient({ registerClient: registerMock });
+		const adapter2 = createMastodonAdapter(
+			config({ client: client2 }),
+			jar(),
+		);
+		await adapter2.buildAuthRedirect({ instanceInput: 'shared-test.example' });
+		expect(registerMock).toHaveBeenCalledTimes(1); // still 1, cache hit
 	});
 });
 

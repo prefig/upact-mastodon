@@ -64,6 +64,20 @@ const VERIFY_CACHE = new Map<
 	{ upactor: Upactor; expires_at: number }
 >();
 
+/**
+ * Module-scoped default `ClientStore`. Per-request adapter construction
+ * (the SvelteKit hook pattern) means each request gets a fresh adapter;
+ * if every adapter created its own store, the OAuth client credentials
+ * registered during init would not be visible at callback time. The
+ * default is module-scoped so single-process deployments that don't
+ * configure `clientStore` still see registered credentials persist
+ * across requests.
+ *
+ * Multi-process deployments override via `config.clientStore` (KV,
+ * Redis, Postgres) to share credentials across regions.
+ */
+const DEFAULT_CLIENT_STORE = new InMemoryClientStore();
+
 const DEFAULT_VERIFY_CACHE_MS = 60_000;
 
 export function createMastodonAdapter(
@@ -73,7 +87,7 @@ export function createMastodonAdapter(
 	const scopes = config.scopes ?? DEFAULT_SCOPES;
 	validateScopes(scopes);
 	const client: MastodonClient = config.client ?? new FetchBackedClient();
-	const clientStore: ClientStore = config.clientStore ?? new InMemoryClientStore();
+	const clientStore: ClientStore = config.clientStore ?? DEFAULT_CLIENT_STORE;
 	const scopeString = scopes.join(' ');
 	const verifyCacheMs = config.verifyCredentialsCacheMs ?? DEFAULT_VERIFY_CACHE_MS;
 
