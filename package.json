@@ -1,0 +1,59 @@
+{
+	"name": "@prefig/upact-mastodon",
+	"version": "0.1.0",
+	"description": "upact adapter for the Mastodon REST API. Per-login instance discovery, dynamic OAuth client registration, no token expiry. Substrate: any Mastodon-API-compatible fediverse server.",
+	"license": "Apache-2.0",
+	"type": "module",
+	"main": "./dist/index.js",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"files": [
+		"dist",
+		"README.md",
+		"LICENSE",
+		"CONFORMANCE.md",
+		"CHANGELOG.md"
+	],
+	"engines": {
+		"node": ">=18"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"sideEffects": false,
+	"keywords": [
+		"upact",
+		"upact-adapter",
+		"mastodon",
+		"fediverse",
+		"activitypub",
+		"identity-port",
+		"oauth",
+		"privacy-by-design"
+	],
+	"author": "Theodore Evans",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/prefig/upact-mastodon.git"
+	},
+	"peerDependencies": {
+		"@prefig/upact": "^0.1.1"
+	},
+	"scripts": {
+		"build": "tsc",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"typecheck": "tsc --noEmit",
+		"prepublishOnly": "npm run build && npm test"
+	},
+	"devDependencies": {
+		"@prefig/upact": "^0.1.1",
+		"@types/node": "^22.0.0",
+		"typescript": "^5.0.0",
+		"vitest": "^3.0.0"
+	}
+}

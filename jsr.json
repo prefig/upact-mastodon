@@ -1,0 +1,11 @@
+{
+	"name": "@prefig/upact-mastodon",
+	"version": "0.1.0",
+	"license": "Apache-2.0",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"imports": {
+		"@prefig/upact": "jsr:@prefig/upact@^0.1.1"
+	}
+}
