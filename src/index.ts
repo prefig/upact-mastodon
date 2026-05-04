@@ -7,7 +7,7 @@
  * dynamic OAuth client registration.
  *
  * Substrate: the Mastodon REST API. Not a generic ActivityPub adapter, and
- * not an ATProto/Bluesky adapter — see the plan in the upact repo for the
+ * not an ATProto/Bluesky adapter: see the plan in the upact repo for the
  * full framing.
  */
 

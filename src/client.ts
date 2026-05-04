@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 /**
- * `MastodonClient` — the adapter's substrate-call seam.
+ * `MastodonClient`: the adapter's substrate-call seam.
  *
  * Five operations cover the entire OAuth + identity-validation flow.
  * The default `FetchBackedClient` uses the global `fetch`, runs in any

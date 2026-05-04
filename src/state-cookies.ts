@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 /**
- * `CookieJar` — abstraction over framework-specific cookie APIs (SvelteKit
+ * `CookieJar`: abstraction over framework-specific cookie APIs (SvelteKit
  * `event.cookies`, Express/Connect `req.cookies` + `res.cookie`, etc).
  *
  * Signed-cookie helpers (`signValue`/`unsignValue`) and the concrete

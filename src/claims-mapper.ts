@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 /**
- * `mapAccountToUpactor` — pure function from substrate-allow-listed
+ * `mapAccountToUpactor`: pure function from substrate-allow-listed
  * `AccountClaims` to a port-shaped `Upactor`.
  *
  * The privacy boundary lives here. Three rules to remember:

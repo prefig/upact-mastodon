@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 /**
- * `ClientStore` — pluggable cache for per-instance OAuth client credentials.
+ * `ClientStore`: pluggable cache for per-instance OAuth client credentials.
  *
  * The default `InMemoryClientStore` is process-lifetime and single-tenant.
  * Multi-process or multi-region deployments inject their own store

@@ -5,7 +5,7 @@
  * `AccountClaims` is intentionally a closed shape: only the fields the
  * adapter is allowed to read from `verify_credentials`. The substrate's
  * actual response carries many more (avatar, header, fields, bot, source,
- * follower counts, …) — they are stripped at the type boundary so the
+ * follower counts, …): they are stripped at the type boundary so the
  * claims-mapper cannot accidentally surface them. See upact SPEC.md §7.
  */
 
@@ -33,7 +33,7 @@ export interface AppRegistration {
 }
 
 /**
- * Subset of `POST /api/v1/apps` response — only the fields the adapter
+ * Subset of `POST /api/v1/apps` response: only the fields the adapter
  * keeps. The full response also includes `id`, `name`, `redirect_uri`, and
  * `vapid_key`; those are not retained.
  */
@@ -53,7 +53,7 @@ export interface TokenExchangeParams {
 
 /**
  * Subset of `POST /oauth/token` response. `created_at` is intentionally
- * not retained — Mastodon access tokens do not auto-expire (F6).
+ * not retained: Mastodon access tokens do not auto-expire (F6).
  */
 export interface TokenResponse {
 	access_token: string;
@@ -63,7 +63,7 @@ export interface TokenResponse {
 
 /**
  * Allow-list shape for `GET /api/v1/accounts/verify_credentials`. **The
- * adapter MUST NOT widen this shape** — substrate fields outside this list
+ * adapter MUST NOT widen this shape**: substrate fields outside this list
  * (avatar, header, fields, source, bot, locked, follower counts, etc.)
  * are stripped at the network boundary so the claims-mapper cannot
  * surface them through the port. See upact SPEC.md §7.
@@ -125,7 +125,7 @@ export interface BuildAuthRedirectInput {
  * of the OAuth flow; it lives outside `IdentityPort` for consistency with
  * the upact-oidc pattern (Decision: D-MAS-3).
  *
- * There is no `buildLogoutRedirect` — Mastodon has no end-session URL
+ * There is no `buildLogoutRedirect`: Mastodon has no end-session URL
  * analog. `invalidate` revokes the access token via `/oauth/revoke` and
  * clears the session cookie; deployment owns its post-logout UX.
  */

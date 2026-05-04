@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 /**
  * Tests for `mapAccountToUpactor`. Test-first per the plan's
- * Execution note for U3 — privacy stripping is the privacy boundary.
+ * Execution note for U3: privacy stripping is the privacy boundary.
  */
 
 import { describe, it, expect } from 'vitest';
@@ -22,7 +22,7 @@ function alice(): AccountClaims {
 	};
 }
 
-describe('mapAccountToUpactor — happy path', () => {
+describe('mapAccountToUpactor: happy path', () => {
 	it('produces an Upactor with id, display_hint, empty capabilities, lifecycle, provenance', async () => {
 		const upactor = await mapAccountToUpactor(alice(), HACHYDERM);
 		expect(upactor.id).toBe('9e4536fe656c192ee8f07f7265eeab91');
@@ -77,7 +77,7 @@ describe('mapAccountToUpactor — happy path', () => {
 	});
 });
 
-describe('mapAccountToUpactor — display_hint email-shape rejection (SPEC §4.2)', () => {
+describe('mapAccountToUpactor: display_hint email-shape rejection (SPEC §4.2)', () => {
 	it('falls back to username when display_name is email-shaped', async () => {
 		const upactor = await mapAccountToUpactor(
 			{ ...alice(), display_name: 'alice@example.com' },
@@ -115,7 +115,7 @@ describe('mapAccountToUpactor — display_hint email-shape rejection (SPEC §4.2
 	});
 });
 
-describe('mapAccountToUpactor — id derivation', () => {
+describe('mapAccountToUpactor: id derivation', () => {
 	it('handles actor URLs with non-default ports deterministically', async () => {
 		const upactor = await mapAccountToUpactor(
 			{
@@ -127,7 +127,7 @@ describe('mapAccountToUpactor — id derivation', () => {
 		expect(upactor.id).toBe('700aebd463a16447b19ba435f0570e20');
 	});
 
-	it('is deterministic — same input twice gives same id', async () => {
+	it('is deterministic: same input twice gives same id', async () => {
 		const u1 = await mapAccountToUpactor(alice(), HACHYDERM);
 		const u2 = await mapAccountToUpactor(alice(), HACHYDERM);
 		expect(u1.id).toBe(u2.id);
@@ -150,7 +150,7 @@ describe('mapAccountToUpactor — id derivation', () => {
 	});
 });
 
-describe('mapAccountToUpactor — privacy stripping (SPEC §7)', () => {
+describe('mapAccountToUpactor: privacy stripping (SPEC §7)', () => {
 	it('does not surface fields the substrate would have included', async () => {
 		// The substrate's verify_credentials response has many more fields
 		// (avatar, header, fields, bot, source, follower counts, ...). The
@@ -195,7 +195,7 @@ describe('mapAccountToUpactor — privacy stripping (SPEC §7)', () => {
 	});
 });
 
-describe('mapAccountToUpactor — provenance', () => {
+describe('mapAccountToUpactor: provenance', () => {
 	it('records the instance origin string (with trailing slash)', async () => {
 		const upactor = await mapAccountToUpactor(alice(), HACHYDERM);
 		expect(upactor.provenance?.instance).toBe('https://hachyderm.io/');
@@ -207,7 +207,7 @@ describe('mapAccountToUpactor — provenance', () => {
 	});
 });
 
-describe('mapAccountToUpactor — lifecycle (F6)', () => {
+describe('mapAccountToUpactor: lifecycle (F6)', () => {
 	it('expires_at is undefined; renewable is "reauth"', async () => {
 		const upactor = await mapAccountToUpactor(alice(), HACHYDERM);
 		expect(upactor.lifecycle?.expires_at).toBeUndefined();

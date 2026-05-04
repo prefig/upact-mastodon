@@ -2,7 +2,7 @@
 import { describe, it, expect } from 'vitest';
 import { DEFAULT_SCOPES, validateScopes } from '../src/scope-policy.js';
 
-describe('validateScopes — happy path', () => {
+describe('validateScopes: happy path', () => {
 	it('accepts ["read:accounts"]', () => {
 		expect(() => validateScopes(['read:accounts'])).not.toThrow();
 	});
@@ -24,7 +24,7 @@ describe('validateScopes — happy path', () => {
 	});
 });
 
-describe('validateScopes — error paths (forbidden scopes)', () => {
+describe('validateScopes: error paths (forbidden scopes)', () => {
 	it('throws on empty scope list', () => {
 		expect(() => validateScopes([])).toThrow(/at least one scope is required/);
 	});
@@ -74,7 +74,7 @@ describe('validateScopes — error paths (forbidden scopes)', () => {
 	});
 });
 
-describe('validateScopes — case sensitivity', () => {
+describe('validateScopes: case sensitivity', () => {
 	it('throws on uppercase variants (Mastodon scopes are lowercase by spec)', () => {
 		expect(() => validateScopes(['Read:Accounts'])).toThrow(/forbidden/);
 	});

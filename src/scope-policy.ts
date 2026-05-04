@@ -2,14 +2,14 @@
 /**
  * Runtime scope discipline for `@prefig/upact-mastodon`.
  *
- * Scope policy is **load-bearing for the privacy contract** — what scopes
+ * Scope policy is **load-bearing for the privacy contract**: what scopes
  * the adapter requests determines what claims the substrate could return.
  * SPEC.md §7 forbids the adapter from accepting scopes that grant access
  * to email, phone, address, statuses, follows, or push. Enforcing this at
  * runtime (not just convention) means a misconfigured deployment fails
  * fast at construction time, before any user sees an authorize URL.
  *
- * Default scope set: `['read:accounts']` — the narrowest scope that
+ * Default scope set: `['read:accounts']`: the narrowest scope that
  * works on Mastodon ≥3.x for `verify_credentials`. Mastodon 4.3+
  * supports the even-narrower `profile` scope; deployments running
  * exclusively against ≥4.3 instances may pass `scopes: ['profile']`.
