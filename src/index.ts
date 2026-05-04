@@ -11,4 +11,31 @@
  * full framing.
  */
 
-export {};
+export { createMastodonAdapter } from './adapter.js';
+export {
+	MastodonInstanceUnreachableError,
+} from './errors.js';
+export {
+	DEFAULT_SCOPES,
+	validateScopes,
+} from './scope-policy.js';
+export {
+	InMemoryClientStore,
+	type ClientStore,
+	type ClientRecord,
+	type InMemoryClientStoreOptions,
+} from './client-store.js';
+export type { CookieJar, CookieSetOptions } from './state-cookies.js';
+export type {
+	MastodonClient,
+	MastodonApiError,
+	MastodonNetworkError,
+} from './client.js';
+export type {
+	MastodonConfig,
+	MastodonCredential,
+	MastodonAdapterExtensions,
+	BuildAuthRedirectInput,
+	AccountClaims,
+	InstanceInfo,
+} from './types.js';

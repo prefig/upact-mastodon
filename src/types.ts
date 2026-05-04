@@ -11,7 +11,6 @@
 
 import type { ClientStore } from './client-store.js';
 import type { MastodonClient } from './client.js';
-import type { CookieJar } from './state-cookies.js';
 
 /**
  * Minimum fields the adapter reads from `GET /api/v1/instance` (v1) or
@@ -130,10 +129,7 @@ export interface BuildAuthRedirectInput {
  * clears the session cookie; deployment owns its post-logout UX.
  */
 export interface MastodonAdapterExtensions {
-	buildAuthRedirect(
-		input: BuildAuthRedirectInput,
-		cookies: CookieJar,
-	): Promise<URL>;
+	buildAuthRedirect(input: BuildAuthRedirectInput): Promise<URL>;
 }
 
 /**
