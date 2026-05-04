@@ -20,11 +20,13 @@
  * about the substrate forces a network round-trip here.
  */
 
-import type { Upactor } from '@prefig/upact';
+import type { Capability, Upactor } from '@prefig/upact';
 import type { AccountClaims } from './types.js';
 
 const ID_LENGTH_HEX = 32;
-const EMPTY_CAPABILITIES: ReadonlySet<never> = Object.freeze(new Set());
+const EMPTY_CAPABILITIES: ReadonlySet<Capability> = Object.freeze(
+	new Set<Capability>(),
+);
 
 export async function mapAccountToUpactor(
 	claims: AccountClaims,
