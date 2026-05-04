@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { SubstrateUnavailableError } from '@prefig/upact';
+import { SubstrateUnavailableError, type Session, type Upactor } from '@prefig/upact';
 import { _unwrapSession } from '@prefig/upact/internal';
 import { createMastodonAdapter } from '../src/adapter.js';
 import { MastodonInstanceUnreachableError } from '../src/errors.js';
@@ -684,6 +684,121 @@ describe('currentUpactor: error paths', () => {
 		await expect(
 			adapter.currentUpactor(new Request('https://app.example/')),
 		).rejects.toBeInstanceOf(SubstrateUnavailableError);
+	});
+});
+
+describe('invalidate', () => {
+	async function authenticate(client: MastodonClient, cookies: ReturnType<typeof jar>) {
+		const adapter = createMastodonAdapter(
+			config({ client, clientStore: seededStore() }),
+			cookies,
+		);
+		const authUrl = await adapter.buildAuthRedirect({
+			instanceInput: 'hachyderm.io',
+		});
+		const request = await callbackUrl(authUrl);
+		const result = await adapter.authenticate({
+			kind: 'mastodon-callback',
+			request,
+		});
+		return { adapter, session: result as Session };
+	}
+
+	it('clears the SessionState cookie', async () => {
+		const cookies = jar();
+		const client = makeClient({
+			exchangeCode: vi.fn(async () => ({
+				access_token: 'tok-inv',
+				scope: 'read:accounts',
+				token_type: 'Bearer',
+			})),
+			verifyCredentials: vi.fn(async () => ALICE_CLAIMS),
+		});
+		const { adapter, session } = await authenticate(client, cookies);
+		expect(cookies.store.has(SESSION_COOKIE_NAME)).toBe(true);
+		await adapter.invalidate(session);
+		expect(cookies.store.has(SESSION_COOKIE_NAME)).toBe(false);
+	});
+
+	it('calls revokeToken with cached client credentials', async () => {
+		const cookies = jar();
+		const revoke = vi.fn(async () => {});
+		const client = makeClient({
+			exchangeCode: vi.fn(async () => ({
+				access_token: 'tok-inv',
+				scope: 'read:accounts',
+				token_type: 'Bearer',
+			})),
+			verifyCredentials: vi.fn(async () => ALICE_CLAIMS),
+			revokeToken: revoke,
+		});
+		const { adapter, session } = await authenticate(client, cookies);
+		await adapter.invalidate(session);
+		expect(revoke).toHaveBeenCalledWith(
+			expect.any(URL),
+			expect.objectContaining({
+				client_id: 'cid-cached',
+				client_secret: 'csec-cached',
+				token: 'tok-inv',
+			}),
+		);
+	});
+
+	it('does not throw when revokeToken fails (best-effort)', async () => {
+		const cookies = jar();
+		const client = makeClient({
+			exchangeCode: vi.fn(async () => ({
+				access_token: 'tok-inv',
+				scope: 'read:accounts',
+				token_type: 'Bearer',
+			})),
+			verifyCredentials: vi.fn(async () => ALICE_CLAIMS),
+			revokeToken: vi.fn(async () => {
+				throw new MastodonNetworkError('boom');
+			}),
+		});
+		const { adapter, session } = await authenticate(client, cookies);
+		await expect(adapter.invalidate(session)).resolves.toBeUndefined();
+		expect(cookies.store.has(SESSION_COOKIE_NAME)).toBe(false);
+	});
+
+	it('is a no-op when given a foreign Session (not produced by this adapter)', async () => {
+		const adapter = createMastodonAdapter(
+			config({ client: makeClient() }),
+			jar(),
+		);
+		// A Session-shaped value not minted by this adapter.
+		const fakeSession = { _opaque: Symbol() } as never;
+		await expect(adapter.invalidate(fakeSession)).resolves.toBeUndefined();
+	});
+
+	it('subsequent currentUpactor returns null', async () => {
+		const cookies = jar();
+		const client = makeClient({
+			exchangeCode: vi.fn(async () => ({
+				access_token: 'tok-inv',
+				scope: 'read:accounts',
+				token_type: 'Bearer',
+			})),
+			verifyCredentials: vi.fn(async () => ALICE_CLAIMS),
+		});
+		const { adapter, session } = await authenticate(client, cookies);
+		await adapter.invalidate(session);
+		expect(
+			await adapter.currentUpactor(new Request('https://app.example/')),
+		).toBeNull();
+	});
+});
+
+describe('issueRenewal', () => {
+	it('returns null unconditionally (Decision 9 + F6)', async () => {
+		const adapter = createMastodonAdapter(config({ client: makeClient() }), jar());
+		const fakeUpactor: Upactor = {
+			id: 'abc',
+			capabilities: new Set(),
+		};
+		expect(await adapter.issueRenewal(fakeUpactor, undefined)).toBeNull();
+		expect(await adapter.issueRenewal(fakeUpactor, { anything: 1 })).toBeNull();
 	});
 });
 

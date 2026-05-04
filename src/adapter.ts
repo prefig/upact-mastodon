@@ -24,6 +24,7 @@ import {
 	type Session,
 	type Upactor,
 } from '@prefig/upact';
+import { _unwrapSession } from '@prefig/upact/internal';
 import { mapAccountToUpactor } from './claims-mapper.js';
 import {
 	FetchBackedClient,
@@ -249,8 +250,24 @@ export function createMastodonAdapter(
 			return upactor;
 		},
 
-		async invalidate(_session: Session): Promise<void> {
-			throw new Error('invalidate: not implemented yet (U10)');
+		async invalidate(session: Session): Promise<void> {
+			const state = _unwrapSession<SessionState>(session);
+			clearSessionState(cookies);
+			if (!state) return;
+			VERIFY_CACHE.delete(state.access_token);
+			const credentials = await clientStore.get(state.instance);
+			if (!credentials) return;
+			try {
+				await client.revokeToken(new URL(state.instance), {
+					client_id: credentials.client_id,
+					client_secret: credentials.client_secret,
+					token: state.access_token,
+				});
+			} catch {
+				// Best-effort. The cookie clear is the load-bearing
+				// client-side step; the substrate-side revoke is hygiene
+				// and can fail silently.
+			}
 		},
 
 		async issueRenewal(
