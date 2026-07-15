@@ -1,7 +1,7 @@
 {
 	"name": "@prefig/upact-mastodon",
 	"version": "0.1.0",
-	"description": "upact adapter for the Mastodon REST API. Per-login instance discovery, dynamic OAuth client registration, no token expiry. Substrate: any Mastodon-API-compatible fediverse server.",
+	"description": "Mastodon adapter for upact.",
 	"license": "Apache-2.0",
 	"type": "module",
 	"main": "./dist/index.js",
