@@ -1,16 +1,16 @@
 # @prefig/upact-mastodon
 
-[upact](https://github.com/prefig/upact) adapter for the Mastodon REST API. Per-login instance discovery, dynamic OAuth client registration, and the privacy-strip discipline upact requires. The user signs in with any Mastodon-API-compatible fediverse server they choose.
+Mastodon adapter for the [upact](https://github.com/prefig/upact) identity port. Per-login instance discovery and dynamic OAuth client registration: the user signs in with any Mastodon-API-compatible fediverse server they choose.
 
-## What this adapter is, and is not
+## What this adapter is
 
-This is a **Mastodon REST API OAuth client** that exposes an `IdentityPort` to your application. The adapter targets servers implementing Mastodon's client-side REST API: Mastodon proper, and (transitively, MAY-work-not-guaranteed at v0.1) Pleroma, Akkoma, GoToSocial, and Iceshrimp.
+A **Mastodon REST API OAuth client** that exposes an `IdentityPort` to your application. The adapter targets servers implementing Mastodon's client-side REST API: Mastodon proper, and (transitively, MAY-work-not-guaranteed at v0.1) Pleroma, Akkoma, GoToSocial, and Iceshrimp. ActivityPub itself defines no end-user authentication for third-party apps, so the Mastodon client API is the authentication surface this adapter speaks.
 
-It is **not a generic ActivityPub adapter**. ActivityPub does not define an end-user authentication mechanism for third-party apps. It is **not an ATProto / Bluesky adapter** either; ATProto uses different identity (DIDs), different discovery (PLC directory), and OAuth + DPoP. Pick the right adapter for your substrate.
+For ATProto / Bluesky, whose identity works differently (DIDs, PLC directory, OAuth + DPoP), use [`@prefig/upact-atproto`](https://github.com/prefig/upact-atproto).
 
 ## Why a direct adapter (vs configuring `@prefig/upact-oidc` with Authentik)
 
-Path B (the OIDC adapter brokered through Authentik or Keycloak) requires preregistering each instance as a federation source at the IDP. For an application whose value proposition is "sign in with any fediverse handle," that preregistration loop is incompatible with the user experience. The direct adapter resolves the user-supplied instance at login time and registers OAuth credentials dynamically.
+Brokering the OIDC adapter through an IDP (Authentik, Keycloak) requires preregistering each instance as a federation source at that IDP. For an application whose value proposition is "sign in with any fediverse handle," that preregistration loop is incompatible with the user experience. The direct adapter resolves the user-supplied instance at login time and registers OAuth credentials dynamically.
 
 If your deployment authenticates against ONE fixed instance (your-org.social), prefer `@prefig/upact-oidc` plus Authentik. If users pick their own home instance, use this package.
 
@@ -117,7 +117,7 @@ interface MastodonConfig {
 
 ## Capabilities
 
-`Upactor.capabilities` is always `[]` for this adapter at v0.1. ActivityPub messaging is a real substrate affordance, but it is not declared here pre-emptively per the [project's audit discipline](https://github.com/prefig/upact/blob/main/CONTRIBUTING.md). New capabilities land when a concrete consumer surfaces.
+`Upactor.capabilities` is always `[]` for this adapter at v0.1. ActivityPub messaging is a real substrate affordance, but it is not declared here pre-emptively: per the project's audit discipline, new capabilities land when a concrete consumer surfaces.
 
 ## Security posture
 
@@ -147,6 +147,6 @@ See `CONFORMANCE.md` for the full conformance statement and the `AuthError` mapp
 
 v0.1.0. First public release. Breaking changes between v0.x revisions are permitted; v1.0 marks the first stable version.
 
-## License
+## Licence
 
 Apache-2.0. See `LICENSE`.
